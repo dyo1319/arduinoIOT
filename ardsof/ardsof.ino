@@ -11,6 +11,7 @@ void setup() {
 
   lastPressTime = millis();
   lastVal = digitalRead(btnPin);
+  wifiClient_Setup();
 }
 
 void loop() {
@@ -20,9 +21,7 @@ void loop() {
     lastPressTime = millis();
     Serial.println(lastPressTime);
   }
-
   measurePressDuration(val);
-
   lastVal = val;
 }
 
