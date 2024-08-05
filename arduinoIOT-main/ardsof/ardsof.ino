@@ -1,4 +1,7 @@
 #define btnPin D5
+#define redPin D1
+#define greenPin D2
+#define bluePin D3
 
 int lastVal;
 unsigned long lastPressTime;
@@ -42,7 +45,27 @@ void measurePressDuration(int btnCurrVal) {
       pressStartTime = 0;
 
       // קריאה לפונקציה לשלוח זמן לשרת רק לאחר סיום הלחיצה
-      SendBtnPressed();
+      long currentDuration = readCurrentDurationFromServer();
+      if (pressDuration < currentDuration || currentDuration == -1) {
+        SendBtnPressed();
+        lightTurquoise();
+      } else {
+        lightOrange();
+      }
     }
   }
+}
+
+void setRGBColor(int red, int green, int blue) {
+  analogWrite(redPin, red);
+  analogWrite(greenPin, green);
+  analogWrite(bluePin, blue);
+}
+
+void lightTurquoise() {
+  setRGBColor(0, 255, 255); // תורכיז
+}
+
+void lightOrange() {
+  setRGBColor(255, 165, 0); // כתום
 }

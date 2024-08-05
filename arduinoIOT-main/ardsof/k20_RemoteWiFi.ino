@@ -21,20 +21,15 @@ void wifiClient_Setup() {
 
 void SendBtnPressed() {
   HTTPClient http;
-  // הגדרת מספר רכיב וערוץ
-  const int deviceID = 1121; // מספר רכיב שלך (תיקנתי ל-11 כפי שצויין)
+  const int deviceID = 1121; // מספר רכיב שלך
   const int channel = 1;   // מספר ערוץ שלך
 
-  // יצירת כתובת ה-URL עם הפרמטרים הנדרשים
   String dataURL = "http://api.kits4.me/GEN/api.php?ACT=SET&DEV=" + String(deviceID) + "&CH=" + String(channel) + "&VAL=" + String(pressDuration);
 
-  // התחלת בקשת HTTP
   http.begin(client, dataURL);
 
-  // שליחת בקשת GET
-  int httpCode = http.GET();
+  int httpCode = http.POST("");
 
-  // הדפסת הקוד שהתקבל מהשרת (אופציונלי)
   if (httpCode > 0) {
     String payload = http.getString();
     Serial.println("Response: " + payload);
@@ -42,4 +37,28 @@ void SendBtnPressed() {
     Serial.println("Error in HTTP request");
   }
   http.end();
+}
+
+long readCurrentDurationFromServer() {
+  HTTPClient http;
+  const int deviceID = 1121; // מספר רכיב שלך
+  const int channel = 1;   // מספר ערוץ שלך
+
+  String dataURL = "http://api.kits4.me/GEN/api.php?ACT=GET&DEV=" + String(deviceID) + "&CH=" + String(channel);
+
+  http.begin(client, dataURL);
+
+  int httpCode = http.GET();
+  long currentDuration = -1;
+
+  if (httpCode > 0) {
+    String payload = http.getString();
+    Serial.println("Response: " + payload);
+    currentDuration = payload.toInt();
+  } else {
+    Serial.println("Error in HTTP request");
+  }
+  http.end();
+
+  return currentDuration;
 }
