@@ -7,7 +7,7 @@ const char* ssid = "RaadHeno";
 const char* pswd = "Raad12340";
 
 WiFiClient client;
-int server_port = 80; //http
+int server_port = 80; 
 
 void wifiClient_Setup() {
   Serial.println("wifiSetup");
@@ -21,8 +21,8 @@ void wifiClient_Setup() {
 
 void SendBtnPressed() {
   HTTPClient http;
-  const int deviceID = 1121; // מספר רכיב שלך
-  const int channel = 1;   // מספר ערוץ שלך
+  const int deviceID = 1121; 
+  const int channel = 1;   
 
   String dataURL = "http://api.kits4.me/GEN/api.php?ACT=SET&DEV=" + String(deviceID) + "&CH=" + String(channel) + "&VAL=" + String(pressDuration);
 
@@ -41,8 +41,8 @@ void SendBtnPressed() {
 
 long readCurrentDurationFromServer() {
   HTTPClient http;
-  const int deviceID = 1121; // מספר רכיב שלך
-  const int channel = 1;   // מספר ערוץ שלך
+  const int deviceID = 1121; 
+  const int channel = 1;   
 
   String dataURL = "http://api.kits4.me/GEN/api.php?ACT=GET&DEV=" + String(deviceID) + "&CH=" + String(channel);
 

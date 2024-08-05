@@ -8,6 +8,12 @@ unsigned long lastPressTime;
 unsigned long pressStartTime = 0;
 unsigned long pressDuration = 0;
 
+
+const int MAX_PRESS_DURATIONS = 10;
+unsigned long pressDurations[MAX_PRESS_DURATIONS] = {0};
+int pressIndex = 0;
+int numPresses = 0; 
+
 void btn_setup(){
   Serial.begin(9600);
   pinMode(btnPin, INPUT_PULLUP);
@@ -22,12 +28,10 @@ void btn_loop() {
 
   if((val == LOW) && (lastVal == HIGH) && (millis() - lastPressTime > 50)) {
     lastPressTime = millis();
-    pressStartTime = lastPressTime; // התחל זמן לחיצה חדש
+    pressStartTime = lastPressTime; 
   }
 
-  // מודדים את משך הלחיצה
   measurePressDuration(val);
-
   lastVal = val;
 }
 
@@ -44,7 +48,14 @@ void measurePressDuration(int btnCurrVal) {
       Serial.println(" milliseconds");
       pressStartTime = 0;
 
-      // קריאה לפונקציה לשלוח זמן לשרת רק לאחר סיום הלחיצה
+      if (numPresses < MAX_PRESS_DURATIONS) {
+        pressDurations[numPresses] = pressDuration;
+        numPresses++;
+      } else {
+        pressDurations[pressIndex] = pressDuration;
+        pressIndex = (pressIndex + 1) % MAX_PRESS_DURATIONS;
+      } 
+
       long currentDuration = readCurrentDurationFromServer();
       if (pressDuration < currentDuration || currentDuration == 0) {
         SendBtnPressed();
@@ -63,9 +74,17 @@ void setRGBColor(int red, int green, int blue) {
 }
 
 void lightTurquoise() {
-  setRGBColor(0, 255, 255); // תורכיז
+  setRGBColor(0, 255, 255); 
 }
 
 void lightOrange() {
-  setRGBColor(255, 165, 0); // כתום
+  setRGBColor(255, 165, 0); 
+}
+
+int getNumPresses() {
+  return numPresses;
+}
+
+unsigned long* getPressDurations() {
+  return pressDurations;
 }
