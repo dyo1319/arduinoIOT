@@ -1,71 +1,25 @@
-#define btnPin D5
-#define redPin D1
-#define greenPin D2
-#define bluePin D3
-
-int lastVal;
-unsigned long lastPressTime;
-unsigned long pressStartTime = 0;
-unsigned long pressDuration = 0;
+#define SETTING_PIN D6
+bool IhaveLed;
 
 void setup() {
   Serial.begin(9600);
-  pinMode(btnPin, INPUT_PULLUP);
+  pinMode(SETTING_PIN,INPUT_PULLUP);
+  IhaveLed = (digitalRead(SETTING_PIN) == LOW) ? true:false;
 
-  lastPressTime = millis();
-  lastVal = digitalRead(btnPin);
-  wifiClient_Setup();
-}
-
-void loop() {
-  int val = digitalRead(btnPin);
-
-  if((val == LOW) && (lastVal == HIGH) && (millis() - lastPressTime > 50)) {
-    lastPressTime = millis();
-    pressStartTime = lastPressTime; // התחל זמן לחיצה חדש
-  }
-
-  // מודדים את משך הלחיצה
-  measurePressDuration(val);
-
-  lastVal = val;
-}
-
-void measurePressDuration(int btnCurrVal) {
-  if (btnCurrVal == LOW) {
-    if (pressStartTime != 0) {
-      pressDuration = millis() - pressStartTime;
-    }
+  if(IhaveLed){
+   WifiSetup();
   } else {
-    if (pressStartTime != 0) {
-      pressDuration = millis() - pressStartTime;
-      Serial.print("Press duration: ");
-      Serial.print(pressDuration);
-      Serial.println(" milliseconds");
-      pressStartTime = 0;
-
-      // קריאה לפונקציה לשלוח זמן לשרת רק לאחר סיום הלחיצה
-      long currentDuration = readCurrentDurationFromServer();
-      if (pressDuration < currentDuration || currentDuration == -1) {
-        SendBtnPressed();
-        lightTurquoise();
-      } else {
-        lightOrange();
-      }
-    }
+    btn_setup();
   }
 }
-
-void setRGBColor(int red, int green, int blue) {
-  analogWrite(redPin, red);
-  analogWrite(greenPin, green);
-  analogWrite(bluePin, blue);
-}
-
-void lightTurquoise() {
-  setRGBColor(0, 255, 255); // תורכיז
-}
-
-void lightOrange() {
-  setRGBColor(255, 165, 0); // כתום
+void loop() {
+  if (digitalRead(SETTING_PIN) == LOW) {
+    if (!IhaveLed) {
+      WifiSetup();
+      IhaveLed = true;
+    }
+    wifi_loop(); 
+  } else {
+    btn_loop();
+  }
 }
